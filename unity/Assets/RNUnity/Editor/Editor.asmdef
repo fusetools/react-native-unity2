@@ -1,0 +1,12 @@
+{
+    "name": "RNUnity.Editor",
+    "includePlatforms": [
+        "Editor"
+    ],
+    "optionalUnityReferences": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

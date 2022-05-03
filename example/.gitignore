@@ -1,0 +1,7 @@
+.DS_Store
+/android/app/build/
+/ios/**/*.xcuserdatad/
+/ios/mytest.xcodeproj/project.xcworkspace/
+/ios/Pods/
+/node_modules/
+/unity/builds/
