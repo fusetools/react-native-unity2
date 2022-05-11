@@ -213,7 +213,7 @@ dependencies {
     }
 
     implementation project(':unityLibrary')
-    implementation files("${project(':unityLibrary').projectDir}/libs/unity-classes.jar")
+    compileOnly files("${project(':unityLibrary').projectDir}/libs/unity-classes.jar")
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
