@@ -100,6 +100,7 @@ static id<RNUnityFramework> _RNUnity_ufw;
         // unity is not initialized
         [framework setExecuteHeader: &_mh_execute_header];
     }
+    [framework setRNUnityProxy: (id<RNUnityProxy>)self];
     [framework setDataBundleId: [bundle.bundleIdentifier cStringUsingEncoding:NSUTF8StringEncoding]];
     [framework runEmbeddedWithArgc: self.argc argv: self.argv appLaunchOpts: applaunchOptions];
 

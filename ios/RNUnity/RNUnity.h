@@ -17,6 +17,13 @@
 @end
 
 
+@protocol RNUnityProxy <NSObject>
+
+- (void)emitEvent:(const char*)name data:(const char*)data;
+
+@end
+
+
 @protocol RNUnityFramework <NSObject>
 
 + (id<RNUnityFramework>)getInstance;
@@ -36,6 +43,8 @@
 - (void)pause:(bool)pause;
 
 - (void)sendMessageToGOWithName:(const char*)goName functionName:(const char*)name message:(const char*)msg;
+
+- (void)setRNUnityProxy:(id<RNUnityProxy>)proxy;
 
 @end
 
