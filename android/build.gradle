@@ -39,5 +39,5 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
 
     implementation project(':unityLibrary')
-    implementation files("${project(':unityLibrary').projectDir}/libs/unity-classes.jar")
+    compileOnly files("${project(':unityLibrary').projectDir}/libs/unity-classes.jar")
 }
