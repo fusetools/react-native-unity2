@@ -1,12 +1,15 @@
 package no.fuse.rnunity;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.FrameLayout;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -20,7 +23,9 @@ import java.lang.reflect.Method;
 
 import javax.annotation.Nonnull;
 
-public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements LifecycleEventListener, View.OnAttachStateChangeListener, IUnityPlayerLifecycleEvents {
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+
+public class RNUnityManager extends SimpleViewManager<RNUnityView> implements LifecycleEventListener, View.OnAttachStateChangeListener, IUnityPlayerLifecycleEvents {
     public static final String REACT_CLASS = "UnityView";
 
     public static UnityPlayer player;
@@ -38,7 +43,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
 
     @Nonnull
     @Override
-    protected UnityPlayer createViewInstance(@Nonnull ThemedReactContext reactContext) {
+    protected RNUnityView createViewInstance(@Nonnull ThemedReactContext reactContext) {
         Log.d("RNUnityManager", "createViewInstance");
 
         final Activity activity = reactContext.getCurrentActivity();
@@ -67,17 +72,27 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             }, 199);
         }
 
-        player.addOnAttachStateChangeListener(this);
+        RNUnityView view = new RNUnityView(activity, player);
+        view.addOnAttachStateChangeListener(this);
+        view.addView(player, 0, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+
         player.windowFocusChanged(true);
         player.requestFocus();
         player.resume();
 
-        return player;
+        return view;
     }
 
     @Override
-    public void onDropViewInstance(UnityPlayer view) {
+    public void onDropViewInstance(RNUnityView view) {
         Log.d("RNUnityManager", "onDropViewInstance: " + view);
+
+        // Force-remove parent view to avoid exceptions thrown
+        resetPlayerParent();
+
+        // Move player to activity before pause
+        Activity activity = (Activity) player.getContext();
+        activity.addContentView(player, new ViewGroup.LayoutParams(1, 1));
 
         view.removeOnAttachStateChangeListener(this);
         player.pause();
@@ -154,5 +169,46 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             return;
 
         Log.e("RNUnityManager", "Unable to reset parent of player " + player);
+    }
+}
+
+class RNUnityView extends FrameLayout {
+    private UnityPlayer player;
+
+    public RNUnityView(Context context, UnityPlayer player) {
+        super(context);
+        this.player = player;
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        Log.d("RNUnityView", "onWindowFocusChanged: " + hasWindowFocus);
+        super.onWindowFocusChanged(hasWindowFocus);
+
+        if (player != null) {
+            player.windowFocusChanged(hasWindowFocus);
+        }
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        Log.d("RNUnityView", "onConfigurationChanged: " + newConfig);
+        super.onConfigurationChanged(newConfig);
+
+        if (player != null) {
+            player.configurationChanged(newConfig);
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        Log.d("RNUnityView", "onDetachedFromWindow");
+        super.onDetachedFromWindow();
+    }
+
+    @Override
+    protected void onWindowVisibilityChanged(int visibility) {
+        Log.d("RNUnityView", "onWindowVisibilityChanged: " + visibility);
+        super.onWindowVisibilityChanged(visibility);
     }
 }
