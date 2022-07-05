@@ -1,9 +1,8 @@
 #!/bin/bash
 set -e
 
-# Use Gradle v6.9.2 to build unityLibrary!
-
 pushd "builds/android" > /dev/null
+gradle wrapper --gradle-version 6.9.2
 ./gradlew build
 popd > /dev/null
 
