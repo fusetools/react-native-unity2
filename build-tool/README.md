@@ -14,6 +14,8 @@ Export your Unity project into this directory:
 
 * `./builds/android/`
 
+> **Unity 2021**: Projects exported from Unity 2021 need changes in `unityLibrary/build.gradle` to build successfully. See [`2021/build.gradle`](2021/build.gradle).
+
 Run the following command:
 
 ```sh
