@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using System;
 
 using Newtonsoft.Json;
@@ -18,7 +17,7 @@ namespace RNUnity
         public void Reject<TReason>(TReason reason)
         {
             RNBridge.EmitEvent("reject", new {
-                handle = this.handle,
+                handle = handle,
                 reason = reason
             });
         }
@@ -26,7 +25,7 @@ namespace RNUnity
         public void Resolve<TRetval>(TRetval retval)
         {
             RNBridge.EmitEvent("resolve", new {
-                handle = this.handle,
+                handle = handle,
                 retval = retval
             });
         }
@@ -34,7 +33,7 @@ namespace RNUnity
         public void Resolve()
         {
             RNBridge.EmitEvent("resolve", new {
-                handle = this.handle
+                handle = handle
             });
         }
     }
