@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -42,6 +44,8 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
         Log.d("RNUnityManager", "createViewInstance");
 
         final Activity activity = reactContext.getCurrentActivity();
+        final Handler handler = new Handler(Looper.getMainLooper());
+        int statusBarColor = activity.getWindow().getStatusBarColor();
 
         if (player == null) {
             player = new UnityPlayer(activity, this);
@@ -50,22 +54,18 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             resetPlayerParent();
 
             // Restart Unity after delay to workaround a glitch
-            // where Unity sometimes seem to stop rendering
-            final Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("RNUnityManager", "Restarting Unity player");
-                            player.pause();
-                            player.resume();
-                        }
-                    });
-                }
-            }, 199);
+            // where Unity sometimes seems to stop rendering
+            handler.postDelayed(() -> activity.runOnUiThread(() -> {
+                Log.d("RNUnityManager", "Restarting Unity player");
+                player.pause();
+                player.resume();
+            }), 199);
         }
+
+        activity.runOnUiThread(() -> {
+            // Reset status bar after Unity changed it
+            resetStatusBar(activity, statusBarColor);
+        });
 
         player.addOnAttachStateChangeListener(this);
         player.windowFocusChanged(true);
@@ -154,5 +154,22 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             return;
 
         Log.e("RNUnityManager", "Unable to reset parent of player " + player);
+    }
+
+    static void resetStatusBar(Activity activity, int color) {
+        int systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        int flags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS |
+                    WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN |
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+
+        Window window = activity.getWindow();
+        View view = window.getDecorView();
+
+        // Remove the existing listener. It seems Unity uses it internally
+        // to detect changes to the visibility flags, and re-apply its own changes.
+        view.setOnSystemUiVisibilityChangeListener(null);
+        view.setSystemUiVisibility(systemUiVisibility);
+        window.setFlags(flags, -1);
+        window.setStatusBarColor(color);
     }
 }
