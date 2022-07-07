@@ -1,15 +1,14 @@
 package no.fuse.rnunity;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.FrameLayout;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -23,9 +22,7 @@ import java.lang.reflect.Method;
 
 import javax.annotation.Nonnull;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-
-public class RNUnityManager extends SimpleViewManager<RNUnityView> implements LifecycleEventListener, View.OnAttachStateChangeListener, IUnityPlayerLifecycleEvents {
+public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements LifecycleEventListener, View.OnAttachStateChangeListener, IUnityPlayerLifecycleEvents {
     public static final String REACT_CLASS = "UnityView";
 
     public static UnityPlayer player;
@@ -43,10 +40,12 @@ public class RNUnityManager extends SimpleViewManager<RNUnityView> implements Li
 
     @Nonnull
     @Override
-    protected RNUnityView createViewInstance(@Nonnull ThemedReactContext reactContext) {
+    protected UnityPlayer createViewInstance(@Nonnull ThemedReactContext reactContext) {
         Log.d("RNUnityManager", "createViewInstance");
 
         final Activity activity = reactContext.getCurrentActivity();
+        final Handler handler = new Handler(Looper.getMainLooper());
+        int statusBarColor = activity.getWindow().getStatusBarColor();
 
         if (player == null) {
             player = new UnityPlayer(activity, this);
@@ -55,44 +54,30 @@ public class RNUnityManager extends SimpleViewManager<RNUnityView> implements Li
             resetPlayerParent();
 
             // Restart Unity after delay to workaround a glitch
-            // where Unity sometimes seem to stop rendering
-            final Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("RNUnityManager", "Restarting Unity player");
-                            player.pause();
-                            player.resume();
-                        }
-                    });
-                }
-            }, 199);
+            // where Unity sometimes seems to stop rendering
+            handler.postDelayed(() -> activity.runOnUiThread(() -> {
+                Log.d("RNUnityManager", "Restarting Unity player");
+                player.pause();
+                player.resume();
+            }), 199);
         }
 
-        RNUnityView view = new RNUnityView(activity, player);
-        view.addOnAttachStateChangeListener(this);
-        view.addView(player, 0, new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+        activity.runOnUiThread(() -> {
+            // Reset status bar after Unity changed it
+            resetStatusBar(activity, statusBarColor);
+        });
 
+        player.addOnAttachStateChangeListener(this);
         player.windowFocusChanged(true);
         player.requestFocus();
         player.resume();
 
-        return view;
+        return player;
     }
 
     @Override
-    public void onDropViewInstance(RNUnityView view) {
+    public void onDropViewInstance(UnityPlayer view) {
         Log.d("RNUnityManager", "onDropViewInstance: " + view);
-
-        // Force-remove parent view to avoid exceptions thrown
-        resetPlayerParent();
-
-        // Move player to activity before pause
-        Activity activity = (Activity) player.getContext();
-        activity.addContentView(player, new ViewGroup.LayoutParams(1, 1));
 
         view.removeOnAttachStateChangeListener(this);
         player.pause();
@@ -170,45 +155,21 @@ public class RNUnityManager extends SimpleViewManager<RNUnityView> implements Li
 
         Log.e("RNUnityManager", "Unable to reset parent of player " + player);
     }
-}
 
-class RNUnityView extends FrameLayout {
-    private UnityPlayer player;
+    static void resetStatusBar(Activity activity, int color) {
+        int systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        int flags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS |
+                    WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN |
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
 
-    public RNUnityView(Context context, UnityPlayer player) {
-        super(context);
-        this.player = player;
-    }
+        Window window = activity.getWindow();
+        View view = window.getDecorView();
 
-    @Override
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        Log.d("RNUnityView", "onWindowFocusChanged: " + hasWindowFocus);
-        super.onWindowFocusChanged(hasWindowFocus);
-
-        if (player != null) {
-            player.windowFocusChanged(hasWindowFocus);
-        }
-    }
-
-    @Override
-    protected void onConfigurationChanged(Configuration newConfig) {
-        Log.d("RNUnityView", "onConfigurationChanged: " + newConfig);
-        super.onConfigurationChanged(newConfig);
-
-        if (player != null) {
-            player.configurationChanged(newConfig);
-        }
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        Log.d("RNUnityView", "onDetachedFromWindow");
-        super.onDetachedFromWindow();
-    }
-
-    @Override
-    protected void onWindowVisibilityChanged(int visibility) {
-        Log.d("RNUnityView", "onWindowVisibilityChanged: " + visibility);
-        super.onWindowVisibilityChanged(visibility);
+        // Remove the existing listener. It seems Unity uses it internally
+        // to detect changes to the visibility flags, and re-apply its own changes.
+        view.setOnSystemUiVisibilityChangeListener(null);
+        view.setSystemUiVisibility(systemUiVisibility);
+        window.setFlags(flags, -1);
+        window.setStatusBarColor(color);
     }
 }
