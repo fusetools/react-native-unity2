@@ -1,5 +1,4 @@
 #import <UnityFramework/UnityFramework.h>
-#import "RNUProxy.h"
 
 @protocol RNUnityProxy <NSObject>
 
@@ -23,7 +22,7 @@ static id<RNUnityProxy> _RNUnityProxy;
 
 @end
 
-void RNUProxyEmitEvent(const char* name, const char* data) {
+extern void RNUProxyEmitEvent(const char* name, const char* data) {
     if (_RNUnityProxy) {
         [_RNUnityProxy emitEvent:name data:data];
     } else {
