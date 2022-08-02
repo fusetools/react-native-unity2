@@ -55,16 +55,28 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
 
             // Restart Unity after delay to workaround a glitch
             // where Unity sometimes seems to stop rendering
-            handler.postDelayed(() -> activity.runOnUiThread(() -> {
-                Log.d("RNUnityManager", "Restarting Unity player");
-                player.pause();
-                player.resume();
-            }), 199);
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("RNUnityManager", "Restarting Unity player");
+                            player.pause();
+                            player.resume();
+                        }
+                    });
+                }
+            }, 199);
         }
 
-        activity.runOnUiThread(() -> {
-            // Reset status bar after Unity changed it
-            resetStatusBar(activity, statusBarColor);
+        // Reset status bar after Unity changed it
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("RNUnityManager", "Resetting status bar");
+                resetStatusBar(activity, statusBarColor);
+            }
         });
 
         player.addOnAttachStateChangeListener(this);
