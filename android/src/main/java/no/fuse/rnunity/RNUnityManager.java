@@ -45,7 +45,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
 
         final Activity activity = reactContext.getCurrentActivity();
         final Handler handler = new Handler(Looper.getMainLooper());
-        int statusBarColor = activity.getWindow().getStatusBarColor();
+        final int statusBarColor = activity.getWindow().getStatusBarColor();
 
         if (player == null) {
             player = new UnityPlayer(activity, this);
