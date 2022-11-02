@@ -22,7 +22,7 @@
   "author": "Fusetools AS (https://fuse.no)",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": "^0.64.1"
+    "react-native": ">=0.64.1"
   },
   "devDependencies": {
     "@types/react-native": "^0.64.24",
