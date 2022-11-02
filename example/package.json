@@ -15,7 +15,7 @@
     "react-native": "0.66.0",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.8.0",
-    "react-native-unity2": "^1.0.3"
+    "react-native-unity2": "git+https://github.com/fusetools/react-native-unity2.git#HEAD"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
