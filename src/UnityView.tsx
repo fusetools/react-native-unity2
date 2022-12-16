@@ -1,21 +1,15 @@
 import * as React from "react"
-import { requireNativeComponent, EventSubscription, NativeModules, View, ViewProperties } from "react-native"
-import { Platform, ViewPropTypes } from "react-native"
+import { requireNativeComponent, EventSubscription, NativeModules, View, ViewProps } from "react-native"
+import { Platform } from "react-native"
 import { UnityModule } from "./UnityModule"
-import * as PropTypes from "prop-types"
 
 const { RNUnity } = NativeModules
 
-export interface UnityViewProps extends ViewProperties {
+export interface UnityViewProps extends ViewProps {
     onMessage?: (message: any) => void
 }
 
 export class UnityView extends React.Component<UnityViewProps> {
-    static propTypes = {
-        ...ViewPropTypes,
-        onMessage: PropTypes.func
-    }
-
     private listener?: EventSubscription
 
     componentDidMount() {
@@ -38,11 +32,7 @@ export class UnityView extends React.Component<UnityViewProps> {
     }
 }
 
-class UnityAndroidView extends React.Component<ViewProperties> {
-    static propTypes = {
-        ...ViewPropTypes
-    }
-
+class UnityAndroidView extends React.Component<ViewProps> {
     render() {
         const { ...props } = this.props
         return (
@@ -60,10 +50,6 @@ class UnityAndroidView extends React.Component<ViewProperties> {
 const NativeUnityView = requireNativeComponent<UnityAndroidViewProps>("UnityView", UnityAndroidView)
 
 class UnityResponderView extends React.Component {
-    static propTypes = {
-        ...ViewPropTypes,
-    }
-
     componentDidMount() {
         RNUnity.initialize()
     }
