@@ -29,7 +29,7 @@
 + (id<RNUnityFramework>)getInstance;
 - (id<RNUnityAppController>)appController;
 
-- (void)setExecuteHeader:(const typeof(_mh_execute_header)*)header;
+- (void)setExecuteHeader:(const void*)header;
 - (void)setDataBundleId:(const char*)bundleId;
 
 - (void)runEmbeddedWithArgc:(int)argc argv:(char*[])argv appLaunchOpts:(NSDictionary*)appLaunchOpts;
