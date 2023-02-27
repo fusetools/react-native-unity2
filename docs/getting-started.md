@@ -1,6 +1,6 @@
 # Getting started
 
-## Before build project in Unity
+## Export project from Unity
 
 * [UNITY VERSION >= 2020.x](https://unity3d.com/ru/get-unity/download/archive)
 
@@ -24,9 +24,9 @@ UNITY PLAYER SETTINGS
 5. `Other Settings` -> `Scripting Backend` -> select `IL2CPP`
 6. `Other Settings` -> `Target Architectures` -> `ARM64` -> selection set !
 
-## Installation
+## Import project in React Native
 
-1. Install package via `npm`
+1. Install `react-native-unity2` via `npm`
 2. Move your Unity project to `unity` folder at project root
 
 ### iOS
@@ -51,7 +51,8 @@ UNITY PLAYER SETTINGS
 <details>
 <summary>Click to expand!</summary>
 
-Add following lines to your project `main.m` file (located at same folder with `AppDelegate`)
+Add the following lines to your `main.m` file
+
 ```objectivec
 #import <UIKit/UIKit.h>
 +++ #import <RNUnity/RNUnity.h>
@@ -67,13 +68,12 @@ int main(int argc, char * argv[]) {
 }
 ```
 
-Add following lines to your project `AppDelegate.m` file
+Add the following lines to your `AppDelegate.mm` file
+
 ```objectivec
 #import "AppDelegate.h"
 
-#import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
-#import <React/RCTRootView.h>
 +++ #import <RNUnity/RNUnity.h>
 
 +++ - (void)applicationWillResignActive:(UIApplication *)application { [[[RNUnity ufw] appController] applicationWillResignActive: application]; }
@@ -93,6 +93,7 @@ Add following lines to your project `AppDelegate.m` file
 <summary>Click to expand!</summary>
 
 Make the following changes to your `AppDelegate.swift` file
+
 ```swift
 @UIApplicationMain
 class AppDelegate: UIApplicationDelegate {
@@ -129,6 +130,7 @@ class AppDelegate: UIApplicationDelegate {
 1. Create directory into ``android/app/libs``
 
 2. Copy libs from ``<project_name>/unity/builds/android/unityLibrary/libs/*`` to ``android/app/libs``
+
 3. Add ndk support into `android/app/build.gradle`
     ```gradle
     defaultConfig {
@@ -138,16 +140,19 @@ class AppDelegate: UIApplicationDelegate {
         }
     }
     ```
+
 4. Append the following lines to `android/settings.gradle`:
   	```gradle
   	include ':unityLibrary'
     project(':unityLibrary').projectDir=new File('..\\unity\\builds\\android\\unityLibrary')
   	```
+
 5. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
   	```gradle
       implementation project(':unityLibrary')
       implementation files("${project(':unityLibrary').projectDir}/libs/unity-classes.jar")
   	```
+
 6. Add strings to ``res/values/strings.xml``
 
     ```javascript
