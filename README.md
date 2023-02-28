@@ -9,6 +9,8 @@ Embed Unity content in your React Native app!
 
 * Includes a complete, pre-configured [Unity project](unity) and an [example app](example).
 
+* The [example app](example) works on machines without Unity installed.
+
 > This module started out as a fork of [react-native-unity-play](https://github.com/azesmway/react-native-unity-play), but is more or less rewritten with new and improved message passing (C# <=> TypeScript), fixing glitches and stability issues, and adding Swift support. That module was forked from other modules also, so kudos to all creators! 🤩
 
 ## Install
@@ -21,30 +23,51 @@ npm install react-native-unity2
 
 ![RNUnity running on Android device](screenshot.jpg)
 
-```javascript
+```typescript
 import React from "react"
-import { Button, View } from "react-native"
-import { UnityModule, UnityView } from "react-native-unity2"
+import {Button, View} from "react-native"
+import {UnityModule, UnityView} from "react-native-unity2"
 
 export default function App() {
   return (
-    <UnityView style={{ flex: 1, justifyContent: "flex-end" }} onMessage={onMessage}>
-      <View style={{ flexDirection: "row", alignContent: "space-between", justifyContent: "center" }}>
-        <Button title={"setColor"} onPress={async () => console.log(await cubeApi.setColor(randomColor()))} />
-        <Button title={"toggleRotate"} onPress={async () => console.log(await cubeApi.toggleRotate())} />
-        <Button title={"getAccount"} onPress={async () => console.log(await cubeApi.getAccount())} />
-        <Button title={"fail"} onPress={async () => console.log(await cubeApi.fail())} />
+    <UnityView
+      style={{flex: 1, justifyContent: "flex-end"}}
+      onMessage={onMessage}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignContent: "space-between",
+          justifyContent: "center",
+        }}>
+        <Button
+          title={"setColor"}
+          onPress={async () =>
+            console.log(await cubeApi.setColor(randomColor()))
+          }
+        />
+        <Button
+          title={"toggleRotate"}
+          onPress={async () => console.log(await cubeApi.toggleRotate())}
+        />
+        <Button
+          title={"getAccount"}
+          onPress={async () => console.log(await cubeApi.getAccount())}
+        />
+        <Button
+          title={"fail"}
+          onPress={async () => console.log(await cubeApi.fail())}
+        />
       </View>
     </UnityView>
   )
 }
 
-const onMessage = data => {
+const onMessage = (data: any) => {
   console.log("Unity message: " + data)
 }
 
 const cubeApi = {
-  setColor(color) {
+  setColor(color: string) {
     return UnityModule.callMethod("Cube", "setColorRN", color)
   },
 
@@ -63,8 +86,8 @@ const cubeApi = {
 
 const randomColor = () => {
   return `#${Math.floor(Math.random() * 16777215)
-      .toString(16)
-      .padStart(6, "0")}`
+    .toString(16)
+    .padStart(6, "0")}`
 }
 ```
 
