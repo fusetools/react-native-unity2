@@ -5,7 +5,7 @@
 
 Embed Unity content in your React Native app!
 
-* Succesfully tested with Unity 2021 (LTS) and 2020 (LTS) on Android and iOS.
+* Succesfully tested with Unity 2022.x, 2021.x and 2020.x on Android and iOS.
 
 * Includes a complete, pre-configured [Unity project](unity) and an [example app](example).
 
@@ -23,7 +23,7 @@ npm install react-native-unity2
 
 ![RNUnity running on Android device](screenshot.jpg)
 
-```typescript
+```javascript
 import React from "react"
 import {Button, View} from "react-native"
 import {UnityModule, UnityView} from "react-native-unity2"
