@@ -2,7 +2,7 @@
 set -e
 
 pushd "builds/android" > /dev/null
-gradle wrapper --gradle-version 6.9.2
+gradle wrapper --gradle-version 7.2
 ./gradlew build
 popd > /dev/null
 
