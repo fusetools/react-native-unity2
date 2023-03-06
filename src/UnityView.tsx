@@ -23,20 +23,18 @@ export class UnityView extends React.Component<UnityViewProps> {
     }
 
     render() {
-        const { ...props } = this.props
         return Platform.OS === "android" ? (
-            <UnityAndroidView {...props} />
+            <UnityAndroidView {...this.props} />
         ) : (
-            <UnityResponderView {...props} />
+            <UnityResponderView {...this.props} />
         )
     }
 }
 
 class UnityAndroidView extends React.Component<ViewProps> {
     render() {
-        const { ...props } = this.props
         return (
-            <View {...props}>
+            <View {...this.props}>
                 <NativeUnityView
                     style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
                 />
@@ -46,8 +44,7 @@ class UnityAndroidView extends React.Component<ViewProps> {
     }
 }
 
-// @ts-ignore
-const NativeUnityView = requireNativeComponent<UnityAndroidViewProps>("UnityView", UnityAndroidView)
+const NativeUnityView = requireNativeComponent<ViewProps>("UnityView")
 
 class UnityResponderView extends React.Component {
     componentDidMount() {
@@ -59,12 +56,10 @@ class UnityResponderView extends React.Component {
     }
 
     render() {
-        const { ...props } = this.props
         return (
-            <NativeResponderView {...props} />
+            <NativeResponderView {...this.props} />
         )
     }
 }
 
-// @ts-ignore
-const NativeResponderView = requireNativeComponent("UnityResponderView", UnityResponderView)
+const NativeResponderView = requireNativeComponent<ViewProps>("UnityResponderView")
