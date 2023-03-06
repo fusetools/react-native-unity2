@@ -18,7 +18,4 @@ RCT_EXPORT_MODULE(UnityResponderView)
     return view;
 }
 
-RCT_EXPORT_VIEW_PROPERTY(fullScreen, BOOL)
-
 @end
-
