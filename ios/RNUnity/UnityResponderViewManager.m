@@ -8,14 +8,7 @@ RCT_EXPORT_MODULE(UnityResponderView)
 
 - (UIView *)view
 {
-    UnityResponderView *view = [UnityResponderView new];
-    UIWindow * main = [[[UIApplication sharedApplication] delegate] window];
-
-    if(main != nil) {
-        [main makeKeyAndVisible];
-    }
-
-    return view;
+    return [UnityResponderView new];
 }
 
 @end

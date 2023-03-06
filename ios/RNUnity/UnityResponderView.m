@@ -5,12 +5,14 @@ UIView* _unityView;
 
 @implementation UnityResponderView
 
--(id)initWithFrame:(CGRect)frame
+- (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
+
     if (!_unityView) {
         _unityView = [[[RNUnity launchWithOptions:nil] appController] rootView];
     }
+
     return self;
 }
 
@@ -20,6 +22,12 @@ UIView* _unityView;
     [_unityView removeFromSuperview];
     _unityView.frame = self.bounds;
     [self insertSubview:_unityView atIndex:0];
+
+    UIWindow * main = [[[UIApplication sharedApplication] delegate] window];
+
+    if (main != nil) {
+        [main makeKeyAndVisible];
+    }
 }
 
 @end
