@@ -1,5 +1,5 @@
-import type { EventSubscription } from 'react-native'
-import { NativeModules, NativeEventEmitter } from 'react-native'
+import type { EventSubscription } from "react-native"
+import { NativeModules, NativeEventEmitter } from "react-native"
 
 const { RNUnity } = NativeModules
 
@@ -8,6 +8,7 @@ export interface UnityModule {
      * Listen for messages from Unity.
      */
     addListener(onMessage: (data: any) => void): EventSubscription
+
     /**
      * Invoke a Unity method returning a promise.
      * @param gameObject The name or path of GameObject.
@@ -15,6 +16,7 @@ export interface UnityModule {
      * @param input An object to serialize as JSON.
      */
     callMethod(gameObject: string, methodName: string, input?: any): Promise<any>
+
     /**
      * Send a message to Unity.
      * @param gameObject The name or path of GameObject.

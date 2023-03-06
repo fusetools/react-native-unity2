@@ -7,6 +7,4 @@
 
 @interface UnityResponderViewManager : RCTViewManager <RCTBridgeModule>
 
-@property UnityFramework * ufw;
-
 @end

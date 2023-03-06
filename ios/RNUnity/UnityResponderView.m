@@ -1,47 +1,32 @@
 #import "UnityResponderView.h"
 #import "RNUnity.h"
 
-NSDictionary* appLaunchOpts;
 UIView* _unityView;
 
 @implementation UnityResponderView
 
--(id)initWithFrame:(CGRect)frame
+- (id)initWithFrame:(CGRect)frame
 {
-  self = [super initWithFrame:frame];
-  if (self) {
-      _unityView = [[[RNUnity launchWithOptions:appLaunchOpts] appController] rootView];
-  }
-  return self;
-}
+    self = [super initWithFrame:frame];
 
-- (void)setFullScreen:(bool)fullScreen
-{
-  _fullScreen = fullScreen;
-}
+    if (!_unityView) {
+        _unityView = [[[RNUnity launchWithOptions:nil] appController] rootView];
+    }
 
-- (void)setUnityView:(UIView *)view
-{
-    self.uView = view;
-    [self setNeedsLayout];
-}
-
-- (void)dealloc
-{
+    return self;
 }
 
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    
-    if (!_fullScreen) {
-        [_unityView removeFromSuperview];
-        _unityView.frame = self.bounds;
-        [self insertSubview:_unityView atIndex:0];
-    } else {
-        UIWindow* unityWindow = [[[RNUnity ufw] appController] window];
-        CGRect viewRect = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
-        unityWindow.frame = viewRect;
+    [_unityView removeFromSuperview];
+    _unityView.frame = self.bounds;
+    [self insertSubview:_unityView atIndex:0];
+
+    UIWindow * main = [[[UIApplication sharedApplication] delegate] window];
+
+    if (main != nil) {
+        [main makeKeyAndVisible];
     }
 }
 
