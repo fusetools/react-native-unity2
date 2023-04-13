@@ -1,6 +1,7 @@
 # react-native-unity2
 
 [![NPM package](https://img.shields.io/npm/v/react-native-unity2.svg?style=flat-square)](https://www.npmjs.com/package/react-native-unity2)
+[![NPM downloads](https://img.shields.io/npm/dt/react-native-unity2?style=flat-square)](https://www.npmjs.com/package/react-native-unity2)
 [![License: MIT](https://img.shields.io/github/license/fusetools/react-native-unity2.svg?style=flat-square)](LICENSE)
 
 Embed Unity content in your React Native app!
