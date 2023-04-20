@@ -115,10 +115,6 @@ RCT_EXPORT_METHOD(initialize) {
     _RNUnity_sharedInstance = self;
 }
 
-RCT_EXPORT_METHOD(unloadUnity) {
-    [self hideUnityWindow];
-}
-
 - (void)startObserving {
     self.hasListeners = YES;
 
@@ -156,14 +152,6 @@ RCT_EXPORT_METHOD(sendMessage:(NSString *)gameObject
 - (void)emitEvent:(NSString *)name data:(NSString *)data {
     if (self.hasListeners) {
         [self sendEventWithName:name body:data];
-    }
-}
-
-- (void)hideUnityWindow {
-    UIWindow * main = [[[UIApplication sharedApplication] delegate] window];
-    if (main != nil) {
-        [main makeKeyAndVisible];
-        [[RNUnity ufw] unloadApplication];
     }
 }
 

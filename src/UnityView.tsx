@@ -59,10 +59,6 @@ class UnityResponderView extends React.Component {
         RNUnity.initialize()
     }
 
-    componentWillUnmount() {
-        RNUnity.unloadUnity()
-    }
-
     render() {
         return (
             <NativeResponderView {...this.props} />
