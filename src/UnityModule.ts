@@ -5,6 +5,12 @@ const { RNUnity } = NativeModules
 
 export interface UnityModule {
     /**
+     * Waits for Unity to be launched and invokes the callback. This means Unity
+     * is ready to receive messages.
+     */
+    ensureIsReady(callback: () => void): void
+
+    /**
      * Listen for messages from Unity.
      */
     addListener(onMessage: (data: any) => void): EventSubscription
@@ -31,8 +37,26 @@ class UnityModuleImpl implements UnityModule {
 
     methodHandle = -1
 
+    isReady = false
+
     constructor() {
         this.eventEmitter = new NativeEventEmitter(RNUnity)
+        const subscription = this.eventEmitter.addListener("ready", () => {
+            this.isReady = true
+            subscription.remove()
+        })
+    }
+
+    ensureIsReady(callback: () => void) {
+        if (this.isReady) {
+            callback()
+            return
+        }
+        const subscription = this.eventEmitter.addListener("ready", () => {
+            this.isReady = true
+            subscription.remove()
+            callback()
+        })
     }
 
     addListener(onMessage: (data: any) => void) {

@@ -6,7 +6,11 @@ import { UnityModule } from "./UnityModule"
 const { RNUnity } = NativeModules
 
 export interface UnityViewProps extends ViewProps {
+    /** Called when a message is received from Unity. */
     onMessage?: (message: any) => void
+
+    /** Called when Unity is ready to receive messages. */
+    onReady?: () => void
 }
 
 export class UnityView extends React.Component<UnityViewProps> {
@@ -15,6 +19,10 @@ export class UnityView extends React.Component<UnityViewProps> {
     componentDidMount() {
         if (this.props.onMessage) {
             this.listener = UnityModule.addListener(this.props.onMessage)
+        }
+
+        if (this.props.onReady) {
+            UnityModule.ensureIsReady(this.props.onReady)
         }
     }
 

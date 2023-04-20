@@ -84,6 +84,9 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
         player.requestFocus();
         player.resume();
 
+        // Notify the app that Unity is ready to receive messages
+        RNUnityModule.getInstance().emitEvent("ready", "");
+
         return player;
     }
 
