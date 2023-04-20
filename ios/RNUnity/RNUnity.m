@@ -13,7 +13,10 @@
 
 RCT_EXPORT_MODULE(RNUnity)
 
+static int _RNUnity_argc;
 static char ** _RNUnity_argv;
+static id<RNUnityFramework> _RNUnity_ufw;
+static RNUnity *_RNUnity_sharedInstance;
 
 + (char **)argv {
     @synchronized (self) {
@@ -27,8 +30,6 @@ static char ** _RNUnity_argv;
     }
 }
 
-static int _RNUnity_argc;
-
 + (int)argc {
     @synchronized (self) {
         return _RNUnity_argc;
@@ -40,8 +41,6 @@ static int _RNUnity_argc;
         _RNUnity_argc = argc;
     }
 }
-
-static id<RNUnityFramework> _RNUnity_ufw;
 
 + (id<RNUnityFramework>)ufw {
     @synchronized (self) {
@@ -97,7 +96,7 @@ static id<RNUnityFramework> _RNUnity_ufw;
 
     id<RNUnityFramework> framework = [bundle.principalClass getInstance];
     if (![framework appController]) {
-        // unity is not initialized
+        // Unity is not initialized
         [framework setExecuteHeader: &_mh_execute_header];
     }
     [framework setRNUnityProxy: (id<RNUnityProxy>)self];
@@ -106,10 +105,11 @@ static id<RNUnityFramework> _RNUnity_ufw;
 
     [self setUfw:framework];
 
+    // Notify the app that Unity is ready to receive messages
+    [_RNUnity_sharedInstance emitEvent:@"ready" data:@""];
+
     return self.ufw;
 }
-
-static RNUnity *_RNUnity_sharedInstance;
 
 RCT_EXPORT_METHOD(initialize) {
     _RNUnity_sharedInstance = self;
@@ -121,6 +121,11 @@ RCT_EXPORT_METHOD(unloadUnity) {
 
 - (void)startObserving {
     self.hasListeners = YES;
+
+    if (_RNUnity_ufw != nil) {
+        // Notify the app that Unity is ready to receive messages
+        [_RNUnity_sharedInstance emitEvent:@"ready" data:@""];
+    }
 }
 
 - (void)stopObserving {
@@ -128,7 +133,7 @@ RCT_EXPORT_METHOD(unloadUnity) {
 }
 
 - (NSArray<NSString *> *)supportedEvents {
-    return @[@"message", @"reject", @"resolve"];
+    return @[@"ready", @"message", @"reject", @"resolve"];
 }
 
 - (dispatch_queue_t)methodQueue {

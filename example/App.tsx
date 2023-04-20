@@ -6,7 +6,8 @@ export default function App() {
   return (
     <UnityView
       style={{flex: 1, justifyContent: "flex-end"}}
-      onMessage={onMessage}>
+      onMessage={onMessage}
+      onReady={onReady}>
       <View
         style={{
           flexDirection: "row",
@@ -38,6 +39,10 @@ export default function App() {
 
 const onMessage = (data: any) => {
   console.log("Unity message: " + data)
+}
+
+const onReady = () => {
+  console.log("Ready!")
 }
 
 const cubeApi = {
