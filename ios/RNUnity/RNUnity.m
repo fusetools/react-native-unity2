@@ -136,6 +136,18 @@ RCT_EXPORT_METHOD(initialize) {
     return dispatch_get_main_queue();
 }
 
+RCT_EXPORT_METHOD(pause) {
+    if (_RNUnity_sharedInstance) {
+        [[RNUnity ufw] pause:true];
+    }
+}
+
+RCT_EXPORT_METHOD(resume) {
+    if (_RNUnity_sharedInstance) {
+        [[RNUnity ufw] pause:false];
+    }
+}
+
 RCT_EXPORT_METHOD(sendMessage:(NSString *)gameObject
                   functionName:(NSString *)functionName
                   message:(NSString *)message) {

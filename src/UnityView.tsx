@@ -57,6 +57,11 @@ const NativeUnityView = requireNativeComponent<ViewProps>("UnityView")
 class UnityResponderView extends React.Component {
     componentDidMount() {
         RNUnity.initialize()
+        RNUnity.resume()
+    }
+
+    componentWillUnmount() {
+        RNUnity.pause()
     }
 
     render() {
