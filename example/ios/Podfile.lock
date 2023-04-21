@@ -413,7 +413,7 @@ PODS:
     - React-jsi (= 0.71.3)
     - React-logger (= 0.71.3)
     - React-perflogger (= 0.71.3)
-  - RNUnity (1.1.0):
+  - RNUnity (1.3.0):
     - React
   - SocketRocket (0.6.0)
   - Yoga (1.14.0)
@@ -619,11 +619,11 @@ SPEC CHECKSUMS:
   React-RCTVibration: 5199a180d04873366a83855de55ac33ce60fe4d5
   React-runtimeexecutor: 7bf0dafc7b727d93c8cb94eb00a9d3753c446c3e
   ReactCommon: 6f65ea5b7d84deb9e386f670dd11ce499ded7b40
-  RNUnity: 8f864d991e7de8ad8f306da8c49cf0dfe60f7a74
+  RNUnity: 16463b0f90667f80786cf78f60da2dba9e6ea5e7
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 5ed1699acbba8863755998a4245daa200ff3817b
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
 PODFILE CHECKSUM: 798a09fee6a35c2f333f1a71c13450ed457ac60f
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.0
