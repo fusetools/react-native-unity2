@@ -8,7 +8,7 @@ Unity artifacts must be added before building the React Native app.
 
 * `unity/android/unityLibrary-release.aar`
 
-> Edit `build.gradle` if you need to switch between `debug` and `release` configurations.
+> The filename of the AAR can be edited in `build.gradle` located in the same directory, to switch between `debug` and `release` variants of your Unity artifact.
 
 ### iOS
 

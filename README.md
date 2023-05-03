@@ -101,7 +101,7 @@ const randomColor = () => {
 
 See [getting started](docs/getting-started.md) for information on how to set up your Unity project and React Native app.
 
-See [Unity artifacts](docs/unity-artifacts.md) for information on how to build your Unity exports in Android Studio and Xcode.
+See [Unity artifacts](docs/unity-artifacts.md) for information on how to build your Unity artifacts in Android Studio and Xcode.
 
 See the included [Unity project](unity) and [React Native app](example) for working examples.
 
