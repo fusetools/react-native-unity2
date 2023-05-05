@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.Window;
-import android.view.WindowManager;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -45,7 +44,9 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
 
         final Activity activity = reactContext.getCurrentActivity();
         final Handler handler = new Handler(Looper.getMainLooper());
-        final int statusBarColor = activity.getWindow().getStatusBarColor();
+
+        final Window window = activity.getWindow();
+        final int windowFlags = window.getAttributes().flags;
 
         if (player == null) {
             player = new UnityPlayer(activity, this);
@@ -70,12 +71,12 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             }, 199);
         }
 
-        // Reset status bar after Unity changed it
+        // Restore original window flags after Unity has modified them
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.d("RNUnityManager", "Resetting status bar");
-                resetStatusBar(activity, statusBarColor);
+                Log.d("RNUnityManager", "Resetting window flags");
+                window.setFlags(windowFlags, -1);
             }
         });
 
@@ -169,22 +170,5 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             return;
 
         Log.e("RNUnityManager", "Unable to reset parent of player " + player);
-    }
-
-    static void resetStatusBar(Activity activity, int color) {
-        int systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-        int flags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS |
-                    WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN |
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-
-        Window window = activity.getWindow();
-        View view = window.getDecorView();
-
-        // Remove the existing listener. It seems Unity uses it internally
-        // to detect changes to the visibility flags, and re-apply its own changes.
-        view.setOnSystemUiVisibilityChangeListener(null);
-        view.setSystemUiVisibility(systemUiVisibility);
-        window.setFlags(flags, -1);
-        window.setStatusBarColor(color);
     }
 }
