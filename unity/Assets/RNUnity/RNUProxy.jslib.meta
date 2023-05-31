@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: cabaa149e03134a648bc2fe41d4e3335
+guid: 6330b6274086a449bbe586af872198a4
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -29,6 +29,7 @@ PluginImporter:
     second:
       enabled: 0
       settings:
+        AndroidSharedLibraryType: Executable
         CPU: ARMv7
   - first:
       Any: 
@@ -48,7 +49,7 @@ PluginImporter:
     second:
       enabled: 0
       settings:
-        CPU: None
+        CPU: x86_64
   - first:
       Standalone: OSXUniversal
     second:
