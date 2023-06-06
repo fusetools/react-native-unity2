@@ -44,9 +44,6 @@ namespace RNUnity
 
         public static new RNPromise<T> Begin(object param)
         {
-            if (Application.isEditor)
-                return new RNPromise<T>();
-
             if (Debug.isDebugBuild)
                 Debug.Log($"{nameof(RNPromise)}: begin");
 
