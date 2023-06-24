@@ -11,6 +11,9 @@ export interface UnityViewProps extends ViewProps {
 
     /** Called when Unity is ready to receive messages. */
     onReady?: () => void
+
+    /** Sets whether the screen should stay on. */
+    keepAwake?: boolean
 }
 
 export class UnityView extends React.Component<UnityViewProps> {
@@ -24,9 +27,17 @@ export class UnityView extends React.Component<UnityViewProps> {
         if (this.props.onReady) {
             UnityModule.ensureIsReady(this.props.onReady)
         }
+
+        if (this.props.keepAwake) {
+            UnityModule.setKeepAwake(this.props.keepAwake)
+        }
     }
 
     componentWillUnmount() {
+        if (this.props.keepAwake) {
+            UnityModule.setKeepAwake(false)
+        }
+
         this.listener?.remove()
     }
 

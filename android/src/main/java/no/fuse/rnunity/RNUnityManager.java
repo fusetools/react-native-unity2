@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.Window;
+import android.view.WindowManager;
 
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -42,6 +43,8 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
     protected UnityPlayer createViewInstance(@Nonnull ThemedReactContext reactContext) {
         Log.d("RNUnityManager", "createViewInstance");
 
+        final RNUnityModule module = RNUnityModule.getInstance();
+
         final Activity activity = reactContext.getCurrentActivity();
         final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -75,8 +78,19 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.d("RNUnityManager", "Resetting window flags");
-                window.setFlags(windowFlags, -1);
+                int flags = windowFlags;
+                boolean keepAwake = module.getKeepAwake();
+
+                // Race condition: Keep awake might be enabled or disabled after
+                // the original flags were saved
+                if (keepAwake) {
+                    flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                } else {
+                    flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                }
+
+                Log.d("RNUnityManager", "Resetting window flags; keepAwake=" + keepAwake);
+                window.setFlags(flags, -1);
             }
         });
 
@@ -86,7 +100,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
         player.resume();
 
         // Notify the app that Unity is ready to receive messages
-        RNUnityModule.getInstance().emitEvent("ready", "");
+        module.emitEvent("ready", "");
 
         return player;
     }

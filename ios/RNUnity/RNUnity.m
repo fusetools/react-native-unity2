@@ -167,4 +167,10 @@ RCT_EXPORT_METHOD(sendMessage:(NSString *)gameObject
     }
 }
 
+RCT_EXPORT_METHOD(setKeepAwake:(BOOL)keepAwake) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[UIApplication sharedApplication] setIdleTimerDisabled:keepAwake];
+    });
+}
+
 @end
