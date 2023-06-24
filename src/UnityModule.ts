@@ -30,6 +30,11 @@ export interface UnityModule {
      * @param message The argument to pass.
      */
     sendMessage(gameObject: string, methodName: string, message: string): void
+
+    /**
+     * Sets whether the screen should stay on.
+     */
+    setKeepAwake(enabled: boolean): void
 }
 
 class UnityModuleImpl implements UnityModule {
@@ -93,6 +98,10 @@ class UnityModuleImpl implements UnityModule {
 
     sendMessage(gameObject: string, methodName: string, message: string) {
         RNUnity.sendMessage(gameObject, methodName, message)
+    }
+
+    setKeepAwake(enabled: boolean) {
+        RNUnity.setKeepAwake(enabled)
     }
 }
 

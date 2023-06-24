@@ -34,7 +34,8 @@ export default function App() {
     <UnityView
       style={{flex: 1, justifyContent: "flex-end"}}
       onMessage={onMessage}
-      onReady={onReady}>
+      onReady={onReady}
+      keepAwake={true}>
       <View
         style={{
           flexDirection: "row",
