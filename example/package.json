@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "react": "18.2.0",
-    "react-native": "0.71.3",
+    "react-native": "0.71.11",
     "react-native-unity2": "git+https://github.com/fusetools/react-native-unity2.git#HEAD"
   },
   "devDependencies": {
