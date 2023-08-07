@@ -1,17 +1,32 @@
-import tar from "tar"
 import path from "path"
 import rimraf from "rimraf"
 import {fileURLToPath} from "url"
+import {spawn} from "child_process"
+
+// This script unzips iOS frameworks relevant on macOS;
+// other platforms can skip this step
+if (process.platform !== "darwin")
+    process.exit(0)
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-console.log("Unpacking Unity files in", __dirname)
+/** Unzips a zip-file using the system command "unzip" */
+function unzip(filename) {
+    const cwd = path.dirname(filename)
+    const zip = path.basename(filename)
+    return new Promise(resolve => {
+        spawn("unzip", [zip], {cwd, stdio: "inherit"})
+            .on("exit", resolve)
+    })
+}
 
-// Delete any old files
-rimraf.sync(`${__dirname}/android`)
-rimraf.sync(`${__dirname}/ios`)
+console.log("Unzipping iOS frameworks")
 
-// Unpack tarballs
-tar.x({C: __dirname, file: `${__dirname}/android.tgz`, sync: true})
-tar.x({C: __dirname, file: `${__dirname}/ios.tgz`, sync: true})
+// Delete existing frameworks
+rimraf.sync(`${__dirname}/ios/UnityFramework.xcframework/ios-arm64/UnityFramework.framework`)
+rimraf.sync(`${__dirname}/ios/UnityFramework.xcframework/ios-x86_64-simulator/UnityFramework.framework`)
+
+// Unzip frameworks
+await unzip(`${__dirname}/ios/UnityFramework.xcframework/ios-arm64/UnityFramework.framework.zip`)
+await unzip(`${__dirname}/ios/UnityFramework.xcframework/ios-x86_64-simulator/UnityFramework.framework.zip`)
