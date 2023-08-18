@@ -94,6 +94,32 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             }
         });
 
+        // Race condition: Keep awake is sometimes turned off after a few
+        // seconds. Check this every second for a couple of seconds and turn it
+        // on again if necessary.
+        for (int i = 2; i < 9; i++) {
+            final int delay = i * 1000;
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final Window window = activity.getWindow();
+                            final int windowFlags = window.getAttributes().flags;
+                            final boolean existing = (windowFlags & WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) == WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+                            final boolean keepAwake = module.getKeepAwake();
+
+                            if (existing != keepAwake) {
+                                Log.d("RNUnityManager", "Keep awake flag out of sync; delay=" + delay);
+                                module.setKeepAwake(keepAwake);
+                            }
+                        }
+                    });
+                }
+            }, delay);
+        }
+
         player.addOnAttachStateChangeListener(this);
         player.windowFocusChanged(true);
         player.requestFocus();
