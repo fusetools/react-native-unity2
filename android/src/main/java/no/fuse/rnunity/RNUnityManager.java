@@ -68,6 +68,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
                             Log.d("RNUnityManager", "Restarting Unity player");
                             player.pause();
                             player.resume();
+                            resetViews(window);
                         }
                     });
                 }
@@ -91,6 +92,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
 
                 Log.d("RNUnityManager", "Resetting window flags; keepAwake=" + keepAwake);
                 window.setFlags(flags, -1);
+                resetViews(window);
             }
         });
 
@@ -113,6 +115,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
                             if (existing != keepAwake) {
                                 Log.d("RNUnityManager", "Keep awake flag out of sync; delay=" + delay);
                                 module.setKeepAwake(keepAwake);
+                                resetViews(window);
                             }
                         }
                     });
@@ -210,5 +213,18 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             return;
 
         Log.e("RNUnityManager", "Unable to reset parent of player " + player);
+    }
+
+    static void resetViews(Window window) {
+        Log.d("RNUnityManager", "Resetting root view");
+        View root = window.getDecorView().findViewById(android.R.id.content);
+        root.setVisibility(View.GONE);
+        root.setVisibility(View.VISIBLE);
+        root.requestLayout();
+
+        Log.d("RNUnityManager", "Resetting player view");
+        player.setVisibility(View.GONE);
+        player.setVisibility(View.VISIBLE);
+        player.requestLayout();
     }
 }
