@@ -19,8 +19,10 @@ npm run android
 npm run ios
 ```
 
-## Unity content
+## Unity artifacts
 
-The included Unity content is located in the [`unity/`](unity/) directory.
+Unity artifacts are located in the [`unity/`](unity/) directory.
 
-Required files are automatically extracted from tarballs while running `npm install`.
+iOS frameworks are automatically extracted when running `npm install`.
+
+[This document](https://github.com/fusetools/react-native-unity2/tree/main/docs/unity-artifacts.md) contains information about updating the artifacts.

@@ -112,8 +112,6 @@ See these source files for details about message passing in Unity:
   * [`RNPromise`](unity/Assets/RNUnity/RNPromise.cs)
   * [Usage examples](unity/Assets/Example/SpinCube.cs)
 
-See [build tool](build-tool) if you need to make **AAR library** (Android) and/or **Universal Framework** (iOS).
-
 ## Contributing
 
 Please [report an issue](https://github.com/fusetools/react-native-unity2/issues) if you encounter a problem, or [open a pull request](https://github.com/fusetools/react-native-unity2/pulls) if you make a patch.
