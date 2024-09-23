@@ -2,6 +2,10 @@
 
 #include <crt_externs.h>
 
+// Use __dso_handle as a ‘universal’ Mach-O image start symbol.
+// https://forums.developer.apple.com/forums/thread/760543
+extern const struct mach_header __dso_handle;
+
 @interface RNUnity ()
 
 @property (nonatomic) BOOL hasListeners;
@@ -97,7 +101,7 @@ static RNUnity *_RNUnity_sharedInstance;
     id<RNUnityFramework> framework = [bundle.principalClass getInstance];
     if (![framework appController]) {
         // Unity is not initialized
-        [framework setExecuteHeader: &_mh_execute_header];
+        [framework setExecuteHeader: &__dso_handle];
     }
     [framework setRNUnityProxy: (id<RNUnityProxy>)self];
     [framework setDataBundleId: [bundle.bundleIdentifier cStringUsingEncoding:NSUTF8StringEncoding]];
