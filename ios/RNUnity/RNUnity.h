@@ -19,7 +19,7 @@
 
 @protocol RNUnityProxy <NSObject>
 
-- (void)emitEvent:(const char*)name data:(const char*)data;
+- (void)emitEvent:(const char *)name data:(const char *)data;
 
 @end
 
@@ -29,10 +29,10 @@
 + (id<RNUnityFramework>)getInstance;
 - (id<RNUnityAppController>)appController;
 
-- (void)setExecuteHeader:(const void*)header;
-- (void)setDataBundleId:(const char*)bundleId;
+- (void)setExecuteHeader:(const void *)header;
+- (void)setDataBundleId:(const char *)bundleId;
 
-- (void)runEmbeddedWithArgc:(int)argc argv:(char*[])argv appLaunchOpts:(NSDictionary*)appLaunchOpts;
+- (void)runEmbeddedWithArgc:(int)argc argv:(char *[])argv appLaunchOpts:(NSDictionary *)appLaunchOpts;
 
 - (void)unloadApplication;
 
@@ -42,7 +42,7 @@
 
 - (void)pause:(bool)pause;
 
-- (void)sendMessageToGOWithName:(const char*)goName functionName:(const char*)name message:(const char*)msg;
+- (void)sendMessageToGOWithName:(const char *)goName functionName:(const char *)name message:(const char *)msg;
 
 - (void)setRNUnityProxy:(id<RNUnityProxy>)proxy;
 
@@ -52,20 +52,20 @@
 @interface RNUnity : RCTEventEmitter <RCTBridgeModule>
 
 @property (atomic, class) int argc;
-@property (atomic, class) char** argv;
+@property (atomic, class) char **argv;
 
 @property (atomic, class) id<RNUnityFramework> ufw;
 
 + (void)initFromSwift;
 
-+ (void)applicationWillResignActive:(UIApplication*)application;
-+ (void)applicationDidEnterBackground:(UIApplication*)application;
-+ (void)applicationWillEnterForeground:(UIApplication*)application;
-+ (void)applicationDidBecomeActive:(UIApplication*)application;
-+ (void)applicationWillTerminate:(UIApplication*)application;
++ (void)applicationWillResignActive:(UIApplication *)application;
++ (void)applicationDidEnterBackground:(UIApplication *)application;
++ (void)applicationWillEnterForeground:(UIApplication *)application;
++ (void)applicationDidBecomeActive:(UIApplication *)application;
++ (void)applicationWillTerminate:(UIApplication *)application;
 
-+ (id<RNUnityFramework>)launchWithOptions:(NSDictionary*)launchOptions;
++ (id<RNUnityFramework>)launchWithOptions:(NSDictionary *)launchOptions;
 
-+ (void)emitEvent:(const char*)name data:(const char*)data;
++ (void)emitEvent:(const char *)name data:(const char *)data;
 
 @end
