@@ -1,12 +1,11 @@
 #import "UnityResponderView.h"
 #import "RNUnity.h"
 
-UIView* _unityView;
+UIView *_unityView;
 
 @implementation UnityResponderView
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
 
     if (!_unityView) {
@@ -16,14 +15,13 @@ UIView* _unityView;
     return self;
 }
 
-- (void)layoutSubviews
-{
+- (void)layoutSubviews {
     [super layoutSubviews];
     [_unityView removeFromSuperview];
     _unityView.frame = self.bounds;
     [self insertSubview:_unityView atIndex:0];
 
-    UIWindow * main = [[[UIApplication sharedApplication] delegate] window];
+    UIWindow *main = [[[UIApplication sharedApplication] delegate] window];
 
     if (main != nil) {
         [main makeKeyAndVisible];

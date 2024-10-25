@@ -6,8 +6,7 @@
 
 RCT_EXPORT_MODULE(UnityResponderView)
 
-- (UIView *)view
-{
+- (UIView *)view {
     return [UnityResponderView new];
 }
 

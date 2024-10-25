@@ -18,84 +18,65 @@ extern const struct mach_header __dso_handle;
 RCT_EXPORT_MODULE(RNUnity)
 
 static int _RNUnity_argc;
-static char ** _RNUnity_argv;
+static char **_RNUnity_argv;
 static id<RNUnityFramework> _RNUnity_ufw;
 static RNUnity *_RNUnity_sharedInstance;
 
 + (char **)argv {
-    @synchronized (self) {
-        return _RNUnity_argv;
-    }
+    return _RNUnity_argv;
 }
 
 + (void)setArgv:(char **)argv {
-    @synchronized (self) {
-        _RNUnity_argv = argv;
-    }
+    _RNUnity_argv = argv;
 }
 
 + (int)argc {
-    @synchronized (self) {
-        return _RNUnity_argc;
-    }
+    return _RNUnity_argc;
 }
 
 + (void)setArgc:(int)argc {
-    @synchronized (self) {
-        _RNUnity_argc = argc;
-    }
+    _RNUnity_argc = argc;
 }
 
 + (id<RNUnityFramework>)ufw {
-    @synchronized (self) {
-        return _RNUnity_ufw;
-    }
+    return _RNUnity_ufw;
 }
 
 + (void)setUfw:(id<RNUnityFramework>)ufw {
-    @synchronized (self) {
-        _RNUnity_ufw = ufw;
-    }
+    _RNUnity_ufw = ufw;
 }
 
 + (void)initFromSwift {
-    NSLog(@"RNUnity.initFromSwift()");
     _RNUnity_argc = *_NSGetArgc();
     _RNUnity_argv = *_NSGetArgv();
 }
 
-+ (void)applicationWillResignActive:(UIApplication*)application {
-    NSLog(@"RNUnity.applicationWillResignActive()");
++ (void)applicationWillResignActive:(UIApplication *)application {
     [[[self ufw] appController] applicationWillResignActive: application];
 }
 
-+ (void)applicationDidEnterBackground:(UIApplication*)application {
-    NSLog(@"RNUnity.applicationDidEnterBackground()");
++ (void)applicationDidEnterBackground:(UIApplication *)application {
     [[[self ufw] appController] applicationDidEnterBackground: application];
 }
 
-+ (void)applicationWillEnterForeground:(UIApplication*)application {
-    NSLog(@"RNUnity.applicationWillEnterForeground()");
++ (void)applicationWillEnterForeground:(UIApplication *)application {
     [[[self ufw] appController] applicationWillEnterForeground: application];
 }
 
-+ (void)applicationDidBecomeActive:(UIApplication*)application {
-    NSLog(@"RNUnity.applicationDidBecomeActive()");
++ (void)applicationDidBecomeActive:(UIApplication *)application {
     [[[self ufw] appController] applicationDidBecomeActive: application];
 }
 
-+ (void)applicationWillTerminate:(UIApplication*)application {
-    NSLog(@"RNUnity.applicationWillTerminate()");
++ (void)applicationWillTerminate:(UIApplication *)application {
     [[[self ufw] appController] applicationWillTerminate: application];
 }
 
-+ (id<RNUnityFramework>)launchWithOptions:(NSDictionary*)applaunchOptions {
-
-    NSString* bundlePath = nil;
++ (id<RNUnityFramework>)launchWithOptions:(NSDictionary *)applaunchOptions {
+    NSString *bundlePath = nil;
     bundlePath = [[NSBundle mainBundle] bundlePath];
     bundlePath = [bundlePath stringByAppendingString: @"/Frameworks/UnityFramework.framework"];
 
-    NSBundle* bundle = [NSBundle bundleWithPath: bundlePath];
+    NSBundle *bundle = [NSBundle bundleWithPath: bundlePath];
     if ([bundle isLoaded] == false) [bundle load];
 
     id<RNUnityFramework> framework = [bundle.principalClass getInstance];
@@ -155,13 +136,12 @@ RCT_EXPORT_METHOD(resume) {
 RCT_EXPORT_METHOD(sendMessage:(NSString *)gameObject
                   functionName:(NSString *)functionName
                   message:(NSString *)message) {
-
     if (_RNUnity_sharedInstance) {
         [[RNUnity ufw] sendMessageToGOWithName:[gameObject UTF8String] functionName:[functionName UTF8String] message:[message UTF8String]];
     }
 }
 
-+ (void)emitEvent:(const char*)name data:(const char*)data {
++ (void)emitEvent:(const char *)name data:(const char *)data {
     [_RNUnity_sharedInstance emitEvent:[NSString stringWithUTF8String:name] data:[NSString stringWithUTF8String:data]];
 }
 
