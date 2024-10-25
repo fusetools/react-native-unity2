@@ -6,7 +6,7 @@
 
 Embed Unity content in your React Native app!
 
-* Succesfully tested with Unity 2022.x, 2021.x and 2020.x on Android and iOS.
+* Succesfully tested with Unity 6000.x, 2022.x, 2021.x and 2020.x, on Android and iOS.
 
 * Includes a complete, pre-configured [Unity project](unity) and an [example app](example).
 
