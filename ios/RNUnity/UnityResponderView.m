@@ -20,6 +20,7 @@ UIView *_unityView;
     [_unityView removeFromSuperview];
     _unityView.frame = self.bounds;
     [self insertSubview:_unityView atIndex:0];
+    _unityView = nil;
 
     UIWindow *main = [[[UIApplication sharedApplication] delegate] window];
 

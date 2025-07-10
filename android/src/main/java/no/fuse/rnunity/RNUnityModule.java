@@ -105,6 +105,20 @@ public class RNUnityModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void unloadUnity() {
+        final Activity activity = getCurrentActivity();
+                if (activity != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("RNUnityModule", "Unload Unity");
+                    unload();
+                }
+            });
+        }
+    }
+
     public static void createPlayer(final Activity activity, final UnityPlayerCallback callback) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         if (unityPlayer != null) {
             callback.onReady();
