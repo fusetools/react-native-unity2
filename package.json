@@ -22,12 +22,12 @@
   "author": "Fusetools AS (https://fuse.no)",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": ">=0.64.1"
+    "react-native": ">=0.68.0"
   },
   "devDependencies": {
-    "@react-native/typescript-config": "0.75.3",
-    "react-native": "0.75.3",
-    "typescript": "5.0.4"
+    "@react-native/typescript-config": "0.85.3",
+    "react-native": "0.85.3",
+    "typescript": "5.9.3"
   },
   "bugs": {
     "url": "https://github.com/fusetools/react-native-unity2/issues"
