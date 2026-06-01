@@ -182,6 +182,14 @@ public class RNUnityManager extends SimpleViewManager<FrameLayout> implements Li
         Log.d("RNUnityManager", "onUnityPlayerQuitted");
     }
 
+    public void unload() {
+        player.unload();
+    }
+
+    public void destroy() {
+        player.destroy();
+    }
+
     static void resetPlayerParent() {
         var view = player.getFrameLayout();
         if (view.getParent() == null)
