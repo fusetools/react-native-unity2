@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.FrameLayout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -15,6 +16,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.unity3d.player.IUnityPlayerLifecycleEvents;
+import com.unity3d.player.UnityPlayerForActivityOrService;
 import com.unity3d.player.UnityPlayer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -22,10 +24,10 @@ import java.lang.reflect.Method;
 
 import javax.annotation.Nonnull;
 
-public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements LifecycleEventListener, View.OnAttachStateChangeListener, IUnityPlayerLifecycleEvents {
+public class RNUnityManager extends SimpleViewManager<FrameLayout> implements LifecycleEventListener, View.OnAttachStateChangeListener, IUnityPlayerLifecycleEvents {
     public static final String REACT_CLASS = "UnityView";
 
-    public static UnityPlayer player;
+    public static UnityPlayerForActivityOrService player;
 
     public RNUnityManager(ReactApplicationContext reactContext) {
         super();
@@ -40,7 +42,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
 
     @Nonnull
     @Override
-    protected UnityPlayer createViewInstance(@Nonnull ThemedReactContext reactContext) {
+    protected FrameLayout createViewInstance(@Nonnull ThemedReactContext reactContext) {
         Log.d("RNUnityManager", "createViewInstance");
 
         final RNUnityModule module = RNUnityModule.getInstance();
@@ -52,7 +54,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
         final int windowFlags = window.getAttributes().flags;
 
         if (player == null) {
-            player = new UnityPlayer(activity, this);
+            player = new UnityPlayerForActivityOrService(activity, this);
         } else {
             // Force-remove parent view to avoid exceptions thrown
             resetPlayerParent();
@@ -120,19 +122,19 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             }, delay);
         }
 
-        player.addOnAttachStateChangeListener(this);
+        player.getFrameLayout().addOnAttachStateChangeListener(this);
         player.windowFocusChanged(true);
-        player.requestFocus();
+        player.getFrameLayout().requestFocus();
         player.resume();
 
         // Notify the app that Unity is ready to receive messages
         module.emitEvent("ready", "");
 
-        return player;
+        return player.getFrameLayout();
     }
 
     @Override
-    public void onDropViewInstance(UnityPlayer view) {
+    public void onDropViewInstance(FrameLayout view) {
         Log.d("RNUnityManager", "onDropViewInstance: " + view);
 
         view.removeOnAttachStateChangeListener(this);
@@ -181,12 +183,13 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
     }
 
     static void resetPlayerParent() {
-        if (player.getParent() == null)
+        var view = player.getFrameLayout();
+        if (view.getParent() == null)
             return;
 
-        ((ViewGroup) player.getParent()).removeView(player);
+        ((ViewGroup) view.getParent()).removeView(view);
 
-        if (player.getParent() == null)
+        if (view.getParent() == null)
             return;
 
         Log.d("RNUnityManager", "Using reflection to reset parent!");
@@ -206,7 +209,7 @@ public class RNUnityManager extends SimpleViewManager<UnityPlayer> implements Li
             e.printStackTrace();
         }
 
-        if (player.getParent() == null)
+        if (view.getParent() == null)
             return;
 
         Log.e("RNUnityManager", "Unable to reset parent of player " + player);
