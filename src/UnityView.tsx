@@ -36,6 +36,7 @@ export class UnityView extends React.Component<UnityViewProps> {
     componentWillUnmount() {
         if (this.props.keepAwake) {
             UnityModule.setKeepAwake(false)
+            UnityModule.unloadUnity()
         }
 
         this.listener?.remove()
