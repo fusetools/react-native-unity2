@@ -103,6 +103,10 @@ class UnityModuleImpl implements UnityModule {
     setKeepAwake(enabled: boolean) {
         RNUnity.setKeepAwake(enabled)
     }
+
+    unloadUnity() {
+        RNUnity.unloadUnity()
+    }
 }
 
 export const UnityModule: UnityModule = new UnityModuleImpl()

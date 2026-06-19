@@ -1,33 +1,37 @@
 package no.fuse.rnunity;
 
-import android.app.Activity;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
-import android.widget.FrameLayout;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.Window;
-import android.view.WindowManager;
+import static no.fuse.rnunity.RNUnityModule.*;
+import no.fuse.rnunity.RNUnityModule.UnityPlayerCallback;
 
+import android.os.Handler;
+import android.view.View;
+import android.util.Log;
+
+import com.facebook.infer.annotation.Assertions;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.SimpleViewManager;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.common.MapBuilder;
+import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.unity3d.player.IUnityPlayerLifecycleEvents;
-import com.unity3d.player.UnityPlayerForActivityOrService;
-import com.unity3d.player.UnityPlayer;
+import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-public class RNUnityManager extends SimpleViewManager<FrameLayout> implements LifecycleEventListener, View.OnAttachStateChangeListener, IUnityPlayerLifecycleEvents {
+@ReactModule(name = RNUnityManager.REACT_CLASS)
+public class RNUnityManager extends SimpleViewManager<RNUnityView> implements LifecycleEventListener, View.OnAttachStateChangeListener {
     public static final String REACT_CLASS = "UnityView";
 
-    public static UnityPlayerForActivityOrService player;
+    public static RNUnityView view;
 
     public RNUnityManager(ReactApplicationContext reactContext) {
         super();
@@ -42,176 +46,120 @@ public class RNUnityManager extends SimpleViewManager<FrameLayout> implements Li
 
     @Nonnull
     @Override
-    protected FrameLayout createViewInstance(@Nonnull ThemedReactContext reactContext) {
+    protected RNUnityView createViewInstance(@Nonnull ThemedReactContext reactContext) {
         Log.d("RNUnityManager", "createViewInstance");
 
         final RNUnityModule module = RNUnityModule.getInstance();
+        view = new RNUnityView(reactContext);
+        view.addOnAttachStateChangeListener(this);
 
-        final Activity activity = reactContext.getCurrentActivity();
-        final Handler handler = new Handler(Looper.getMainLooper());
-
-        final Window window = activity.getWindow();
-        final int windowFlags = window.getAttributes().flags;
-
-        if (player == null) {
-            player = new UnityPlayerForActivityOrService(activity, this);
+        if (getPlayer() != null) {
+            try {
+                view.setUnityPlayer(getPlayer());
+            } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {}
         } else {
-            // Force-remove parent view to avoid exceptions thrown
-            resetPlayerParent();
-
-            // Restart Unity after delay to workaround a glitch
-            // where Unity sometimes seems to stop rendering
-            handler.postDelayed(new Runnable() {
+            try {
+                createPlayer(reactContext.getCurrentActivity(), new UnityPlayerCallback() {
                 @Override
-                public void run() {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d("RNUnityManager", "Restarting Unity player");
-                            player.pause();
-                            player.resume();
-                        }
-                    });
+                public void onReady() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                    view.setUnityPlayer(getPlayer());
+                    module.emitEvent("ready", "");
                 }
-            }, 199);
-        }
-
-        // Restore original window flags after Unity has modified them
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int flags = windowFlags;
-                boolean keepAwake = module.getKeepAwake();
-
-                // Race condition: Keep awake might be enabled or disabled after
-                // the original flags were saved
-                if (keepAwake) {
-                    flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-                } else {
-                    flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-                }
-
-                Log.d("RNUnityManager", "Resetting window flags; keepAwake=" + keepAwake);
-                window.setFlags(flags, -1);
-            }
-        });
-
-        // Race condition: Keep awake is sometimes turned off after a few
-        // seconds. Check this every second for a couple of seconds and turn it
-        // on again if necessary.
-        for (int i = 2; i < 9; i++) {
-            final int delay = i * 1000;
-            handler.postDelayed(new Runnable() {
+                
                 @Override
-                public void run() {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final Window window = activity.getWindow();
-                            final int windowFlags = window.getAttributes().flags;
-                            final boolean existing = (windowFlags & WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) == WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-                            final boolean keepAwake = module.getKeepAwake();
-
-                            if (existing != keepAwake) {
-                                Log.d("RNUnityManager", "Keep awake flag out of sync; delay=" + delay);
-                                module.setKeepAwake(keepAwake);
-                            }
-                        }
-                    });
+                public void onUnload() {
+                    module.emitEvent("onPlayerUnload", "");
                 }
-            }, delay);
-        }
-
-        player.getFrameLayout().addOnAttachStateChangeListener(this);
-        player.windowFocusChanged(true);
-        player.getFrameLayout().requestFocus();
-        player.resume();
-
-        // Notify the app that Unity is ready to receive messages
-        module.emitEvent("ready", "");
-
-        return player.getFrameLayout();
+                
+                @Override
+                public void onQuit() {
+                    module.emitEvent("onPlayerQuit", "");
+                }
+            });
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {}
+    }
+    
+        return view;
     }
 
     @Override
-    public void onDropViewInstance(FrameLayout view) {
-        Log.d("RNUnityManager", "onDropViewInstance: " + view);
-
+    public void onDropViewInstance(RNUnityView view) {
         view.removeOnAttachStateChangeListener(this);
-        player.pause();
+        super.onDropViewInstance(view);
     }
 
     @Override
     public void onHostResume() {
-        Log.d("RNUnityManager", "onHostResume");
-
-        if (player != null)
-            player.resume();
+        if (isUnityReady()) {
+        assert getPlayer() != null;
+        getPlayer().resume();
+        restoreUnityUserState();
+        }
     }
 
     @Override
     public void onHostPause() {
-        Log.d("RNUnityManager", "onHostPause");
-
-        if (player != null)
-            player.pause();
+        if (isUnityReady()) {
+        assert getPlayer() != null;
+        getPlayer().pause();
+        }
     }
 
     @Override
     public void onHostDestroy() {
-        Log.d("RNUnityManager", "onHostDestroy");
-    }
-
-    @Override
-    public void onViewAttachedToWindow(View view) {
-        Log.d("RNUnityManager", "onViewAttachedToWindow: " + view);
-    }
-
-    @Override
-    public void onViewDetachedFromWindow(View view) {
-        Log.d("RNUnityManager", "onViewDetachedFromWindow: " + view);
-    }
-
-    @Override
-    public void onUnityPlayerUnloaded() {
-        Log.d("RNUnityManager", "onUnityPlayerUnloaded");
-    }
-
-    @Override
-    public void onUnityPlayerQuitted() {
-        Log.d("RNUnityManager", "onUnityPlayerQuitted");
-    }
-
-    static void resetPlayerParent() {
-        var view = player.getFrameLayout();
-        if (view.getParent() == null)
-            return;
-
-        ((ViewGroup) view.getParent()).removeView(view);
-
-        if (view.getParent() == null)
-            return;
-
-        Log.d("RNUnityManager", "Using reflection to reset parent!");
-
-        try {
-            Method method = View.class.getDeclaredMethod("assignParent", new Class<?>[]{ ViewParent.class });
-            method.setAccessible(true);
-            method.invoke(player, new Object[]{ null });
-            method.setAccessible(false);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        if (isUnityReady()) {
+        assert getPlayer() != null;
+        getPlayer().destroy();
         }
+    }
 
-        if (view.getParent() == null)
-            return;
+    @Override
+    public void onViewAttachedToWindow(View v) {
+        restoreUnityUserState();
+    }
 
-        Log.e("RNUnityManager", "Unable to reset parent of player " + player);
+    @Override
+    public void onViewDetachedFromWindow(View v) {}
+
+    public void unloadUnity(RNUnityView view) {
+        if (isUnityReady()) {
+        getPlayer().unload();
+        }
+    }
+
+    public void pauseUnity(RNUnityView view, boolean pause) {
+        if (isUnityReady()) {
+        assert getPlayer() != null;
+        getPlayer().pause();
+        }
+    }
+
+    public void resumeUnity(RNUnityView view) {
+        if (isUnityReady()) {
+        assert getPlayer() != null;
+        getPlayer().resume();
+        }
+    }
+
+    public void windowFocusChanged(RNUnityView view, boolean hasFocus) {
+        if (isUnityReady()) {
+        assert getPlayer() != null;
+        getPlayer().windowFocusChanged(hasFocus);
+        }
+    }
+    
+    private void restoreUnityUserState() {
+        // restore the unity player state
+        if (isUnityPaused()) {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            if (getPlayer() != null) {
+                getPlayer().pause();
+            }
+            }
+        }, 300);
+        }
     }
 }

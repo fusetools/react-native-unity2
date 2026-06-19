@@ -51,24 +51,38 @@ static RNUnity *_RNUnity_sharedInstance;
     _RNUnity_argv = *_NSGetArgv();
 }
 
++ (bool)unityIsInitialized {
+    return _RNUnity_sharedInstance && [[self ufw] appController];
+}
+
 + (void)applicationWillResignActive:(UIApplication *)application {
-    [[[self ufw] appController] applicationWillResignActive: application];
+    if ([RNUnity unityIsInitialized]) {
+        [[[self ufw] appController] applicationWillResignActive: application];
+    }
 }
 
 + (void)applicationDidEnterBackground:(UIApplication *)application {
-    [[[self ufw] appController] applicationDidEnterBackground: application];
+    if ([RNUnity unityIsInitialized]) {
+        [[[self ufw] appController] applicationDidEnterBackground: application];
+    }
 }
 
 + (void)applicationWillEnterForeground:(UIApplication *)application {
-    [[[self ufw] appController] applicationWillEnterForeground: application];
+    if ([RNUnity unityIsInitialized]) {
+        [[[self ufw] appController] applicationWillEnterForeground: application];
+    }
 }
 
 + (void)applicationDidBecomeActive:(UIApplication *)application {
-    [[[self ufw] appController] applicationDidBecomeActive: application];
+    if ([RNUnity unityIsInitialized]) {
+        [[[self ufw] appController] applicationDidBecomeActive: application];
+    }
 }
 
 + (void)applicationWillTerminate:(UIApplication *)application {
-    [[[self ufw] appController] applicationWillTerminate: application];
+    if ([RNUnity unityIsInitialized]) {
+        [[[self ufw] appController] applicationWillTerminate: application];
+    }
 }
 
 + (id<RNUnityFramework>)launchWithOptions:(NSDictionary *)applaunchOptions {
@@ -84,10 +98,11 @@ static RNUnity *_RNUnity_sharedInstance;
         // Unity is not initialized
         [framework setExecuteHeader: &__dso_handle];
     }
-    [framework setRNUnityProxy: (id<RNUnityProxy>)self];
-    [framework setDataBundleId: [bundle.bundleIdentifier cStringUsingEncoding:NSUTF8StringEncoding]];
-    [framework runEmbeddedWithArgc: self.argc argv: self.argv appLaunchOpts: applaunchOptions];
 
+    [framework setDataBundleId: [bundle.bundleIdentifier cStringUsingEncoding:NSUTF8StringEncoding]];
+    [framework setRNUnityProxy: (id<RNUnityProxy>)self];
+
+    [framework runEmbeddedWithArgc: self.argc argv: self.argv appLaunchOpts: applaunchOptions];
     [self setUfw:framework];
 
     // Notify the app that Unity is ready to receive messages
@@ -122,13 +137,13 @@ RCT_EXPORT_METHOD(initialize) {
 }
 
 RCT_EXPORT_METHOD(pause) {
-    if (_RNUnity_sharedInstance) {
+    if ([RNUnity unityIsInitialized]) {
         [[RNUnity ufw] pause:true];
     }
 }
 
 RCT_EXPORT_METHOD(resume) {
-    if (_RNUnity_sharedInstance) {
+    if ([RNUnity unityIsInitialized]) {
         [[RNUnity ufw] pause:false];
     }
 }
@@ -136,7 +151,7 @@ RCT_EXPORT_METHOD(resume) {
 RCT_EXPORT_METHOD(sendMessage:(NSString *)gameObject
                   functionName:(NSString *)functionName
                   message:(NSString *)message) {
-    if (_RNUnity_sharedInstance) {
+    if ([RNUnity unityIsInitialized]) {
         [[RNUnity ufw] sendMessageToGOWithName:[gameObject UTF8String] functionName:[functionName UTF8String] message:[message UTF8String]];
     }
 }
@@ -155,6 +170,13 @@ RCT_EXPORT_METHOD(setKeepAwake:(BOOL)keepAwake) {
     dispatch_async(dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] setIdleTimerDisabled:keepAwake];
     });
+}
+
+RCT_EXPORT_METHOD(unloadUnity) {
+    if ([RNUnity unityIsInitialized]) {
+        [[RNUnity ufw] unloadApplication];
+        [RNUnity setUfw:nil];
+    }
 }
 
 @end
