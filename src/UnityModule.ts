@@ -37,15 +37,22 @@ export interface UnityModule {
     setKeepAwake(enabled: boolean): void
 }
 
+type UnityEventMap = {
+    ready: []
+    message: [string]
+    reject: [string]
+    resolve: [string]
+}
+
 class UnityModuleImpl implements UnityModule {
-    eventEmitter: NativeEventEmitter
+    eventEmitter: NativeEventEmitter<UnityEventMap>
 
     methodHandle = -1
 
     isReady = false
 
     constructor() {
-        this.eventEmitter = new NativeEventEmitter(RNUnity)
+        this.eventEmitter = new NativeEventEmitter<UnityEventMap>(RNUnity)
         const subscription = this.eventEmitter.addListener("ready", () => {
             this.isReady = true
             subscription.remove()
@@ -73,7 +80,7 @@ class UnityModuleImpl implements UnityModule {
     async callMethod(gameObject: string, methodName: string, input: any) {
         return new Promise((resolve, reject) => {
             const handle = ++this.methodHandle
-            const onReject = this.eventEmitter.addListener("reject", json => {
+            const onReject = this.eventEmitter.addListener("reject", (json: string) => {
                 const args = JSON.parse(json)
                 if (args.handle === handle) {
                     onReject.remove()
@@ -81,7 +88,7 @@ class UnityModuleImpl implements UnityModule {
                     reject(args.reason)
                 }
             })
-            const onResolve = this.eventEmitter.addListener("resolve", json => {
+            const onResolve = this.eventEmitter.addListener("resolve", (json: string) => {
                 const args = JSON.parse(json)
                 if (args.handle === handle) {
                     onReject.remove()
