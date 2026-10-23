@@ -4,7 +4,8 @@
 
 // Use __dso_handle as a ‘universal’ Mach-O image start symbol.
 // https://forums.developer.apple.com/forums/thread/760543
-extern const struct mach_header __dso_handle;
+// Match the non-const declaration in <os/trace_base.h> included by newer React Native headers.
+extern struct mach_header __dso_handle;
 
 @interface RNUnity ()
 
