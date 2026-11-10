@@ -37,6 +37,7 @@ export interface UnityModule {
     setKeepAwake(enabled: boolean): void
 }
 
+// NativeEventEmitter is generic in React Native's Strict TypeScript API (0.80+).
 type UnityEventMap = {
     ready: []
     message: [string]

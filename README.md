@@ -6,6 +6,8 @@
 
 Embed Unity content in your React Native app!
 
+* `3.x`: Requires React Native 0.80 or newer and its Strict TypeScript API. See [requirements](#requirements).
+
 * `2.x`: Succesfully tested with Unity 6000.x on Android and iOS.
 
 * `1.x`: Succesfully tested with Unity 2022.x, 2021.x and 2020.x on Android and iOS.
@@ -15,6 +17,23 @@ Embed Unity content in your React Native app!
 * The [example app](example) works on machines without Unity installed.
 
 > This module started out as a fork of [react-native-unity-play](https://github.com/azesmway/react-native-unity-play), but is more or less rewritten with new and improved message passing (C# <=> TypeScript), fixing glitches and stability issues, and adding Swift support. That module was forked from other modules also, so kudos to all creators! 🤩
+
+## Requirements
+
+Version 3 requires React Native 0.80 or newer because it uses React Native's [Strict TypeScript API](https://reactnative.dev/docs/strict-typescript-api).
+
+For React Native 0.80 through 0.86, enable the Strict TypeScript API in your app's `tsconfig.json`:
+
+```json
+{
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "customConditions": ["react-native-strict-api"]
+  }
+}
+```
+
+React Native 0.87 and newer enable the Strict TypeScript API by default.
 
 ## Install
 
